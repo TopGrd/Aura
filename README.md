@@ -4,6 +4,7 @@
 const aura = new Aura({
   server: 'http://localhost:3000',
   // 对错误进行再加工
+  method: 'POST',
   parser: function parser(data) {
     data.sign = 'xx'
   },
