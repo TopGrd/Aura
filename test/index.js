@@ -35,7 +35,8 @@ var _ = {
 }
 
 class Processor {
-  constructor({ parser, beforeSend, sendSuccess, server }) {
+  constructor({ method, parser, beforeSend, sendSuccess, server }) {
+    this.$method = method
     this.$parser = _.isFunction(parser) ? parser : false
     this.$beforeSend = _.isFunction(beforeSend) ? beforeSend : false
     this.$sendSuccess = _.isFunction(sendSuccess) ? sendSuccess : false
@@ -104,14 +105,19 @@ class Processor {
     if (!_.isString(errMsg)) {
       errMsg = JSON.stringify(errMsg)
     }
-    debugger
-    console.log(this)
-    this.xhr.open('POST', this.$server)
-    this.xhr.setRequestHeader(
-      'Content-Type',
-      'application/x-www-form-urlencoded'
-    )
-    this.xhr.send(errMsg)
+
+    if (this.$method === 'GET' ) {
+      this.$server = `${this.$server}?err=${errMsg}`
+    }
+
+    this.xhr.open(this.$method, this.$server)
+
+    if (this.$method === 'GET') {
+      this.xhr.send();
+    } else {
+      this.xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+      this.xhr.send(errMsg);
+    }
   }
 
   process() {
@@ -126,9 +132,9 @@ class Processor {
 
 class Aura extends Processor {
   constructor(options) {
-    const { server, parser, beforeSend, sendSuccess, offLine } = options
+    const { method, server, parser, beforeSend, sendSuccess, offLine } = options
 
-    super({ parser, beforeSend, sendSuccess, server })
+    super({ method, parser, beforeSend, sendSuccess, server })
 
     this.offLine = !!offLine
     this.init()
@@ -175,6 +181,7 @@ class Aura extends Processor {
 
 const aura = new Aura({
   server: 'http://localhost:3000',
+  method: 'GET',
   parser: function parser(data) {
     data.sign = 'xx'
   },

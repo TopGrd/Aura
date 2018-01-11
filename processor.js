@@ -1,5 +1,6 @@
 class Processor {
-  constructor({ parser, beforeSend, sendSuccess, server }) {
+  constructor({ method, parser, beforeSend, sendSuccess, server }) {
+    this.$method = method.toUpperCase()
     this.$parser = _.isFunction(parser) ? parser : false
     this.$beforeSend = _.isFunction(beforeSend) ? beforeSend : false
     this.$sendSuccess = _.isFunction(sendSuccess) ? sendSuccess : false
@@ -61,12 +62,18 @@ class Processor {
       errMsg = JSON.stringify(errMsg)
     }
 
-    this.xhr.open('POST', this.$server)
-    this.xhr.setRequestHeader(
-      'Content-Type',
-      'application/x-www-form-urlencoded'
-    )
-    this.xhr.send(errMsg)
+    if (this.$method === 'GET' ) {
+      this.$server = `${this.$server}?err=${errMsg}`
+    }
+
+    this.xhr.open(this.$method, this.$server)
+
+    if (this.$method === 'GET') {
+      this.xhr.send();
+    } else {
+      this.xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+      this.xhr.send(errMsg);
+    }
   }
 
   process() {

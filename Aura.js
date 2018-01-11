@@ -2,7 +2,7 @@ class Aura extends Processor {
   constructor(options) {
     const { server, parser, beforeSend, sendSuccess, offLine } = options
 
-    super({ parser, beforeSend, sendSuccess, server })
+    super({ method, parser, beforeSend, sendSuccess, server })
 
     this.offLine = !!offLine
     this.init()
